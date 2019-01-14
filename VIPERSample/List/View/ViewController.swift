@@ -38,6 +38,7 @@ class ViewController: UIViewController {
 extension ViewController: ViewControllerViewProtocol {
     func showError(_ error: String) {
         let alert = UIAlertController(title: "Atenção", message: error, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
     
