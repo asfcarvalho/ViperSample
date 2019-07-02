@@ -1,9 +1,9 @@
 //
 //  UIView+anchors.swift
-//  EasyAnchorsLBTA
+//  GenBit
 //
-//  Created by Brian Voong on 1/30/18.
-//  Copyright © 2018 Lets Build That App. All rights reserved.
+//  Created by Proaire on 01/07/19.
+//  Copyright © 2019 Treepart. All rights reserved.
 //
 
 import UIKit
@@ -11,7 +11,7 @@ import UIKit
 extension UIView {
     
     func fillSuperview(padding: UIEdgeInsets) {
-        anchor(top: superview?.safeAreaLayoutGuide.topAnchor, leading: superview?.leadingAnchor, bottom: superview?.safeAreaLayoutGuide.bottomAnchor, trailing: superview?.trailingAnchor, padding: padding)
+        anchor(top: superview?.safeAreaLayoutGuide.topAnchor, leading: superview?.leadingAnchor, bottom: superview?.safeAreaLayoutGuide.bottomAnchor, trailing: superview?.trailingAnchor, centerX: nil, centerY: nil, padding: padding)
     }
     
     func fillSuperview() {
@@ -23,7 +23,7 @@ extension UIView {
         heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
     }
     
-    func anchor(top: NSLayoutYAxisAnchor?, leading: NSLayoutXAxisAnchor?, bottom: NSLayoutYAxisAnchor?, trailing: NSLayoutXAxisAnchor?, padding: UIEdgeInsets = .zero, size: CGSize = .zero) {
+    func anchor(top: NSLayoutYAxisAnchor?, leading: NSLayoutXAxisAnchor?, bottom: NSLayoutYAxisAnchor?, trailing: NSLayoutXAxisAnchor?, centerX: NSLayoutXAxisAnchor? = nil, centerY: NSLayoutYAxisAnchor? = nil, padding: UIEdgeInsets = .zero, size: CGSize = .zero) {
         translatesAutoresizingMaskIntoConstraints = false
         
         if let top = top {
@@ -40,6 +40,14 @@ extension UIView {
         
         if let trailing = trailing {
             trailingAnchor.constraint(equalTo: trailing, constant: -padding.right).isActive = true
+        }
+        
+        if let centerX = centerX {
+            centerXAnchor.constraint(equalTo: centerX).isActive = true
+        }
+        
+        if let centerY = centerY {
+            centerYAnchor.constraint(equalTo: centerY).isActive = true
         }
         
         if size.width != 0 {
