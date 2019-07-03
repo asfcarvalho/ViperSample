@@ -8,11 +8,12 @@
 
 import UIKit
 
-class BaseViewController: UIViewController, UITextFieldDelegate {
+class BaseViewController: UIViewController {
     
     var textFieldRealYPosition: CGFloat = 0.0
     var scrollView = UIScrollView(frame: CGRect.zero)
     var safeView = UIView(frame: CGRect.zero)
+    var replacementChar: Character = "*"
     static var activeField: UITextField?
 
     override func viewDidLoad() {
@@ -79,18 +80,22 @@ class BaseViewController: UIViewController, UITextFieldDelegate {
                 aRect.size.height -= (keyboardSize.height + 10)
                 
                 let y = abs((scrollView.frame.height - activeField.frame.origin.y - activeField.frame.height) - keyboardSize.height)
-//                if !aRect.contains(activeField.frame.origin) {
+                
                 if (activeField.frame.origin.y + activeField.frame.height) > (scrollView.frame.height - keyboardSize.height) {
                     scrollView.setContentOffset(CGPoint(x: 0.0, y: y + 5), animated: true)
                 }
             }
-        }//(activeField.frame.origin.y + activeField.frame.height) > (scrollView.frame.height - keyboardSize.height)
+        }
     }
     
     @objc func keyboardWillHide(notification: NSNotification) {
         scrollView.setContentOffset(CGPoint(x: 0.0, y: 0.0), animated: true)
     }
     
+    
+}
+
+extension BaseViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         BaseViewController.activeField = textField
     }
@@ -112,4 +117,40 @@ class BaseViewController: UIViewController, UITextFieldDelegate {
         
         return false
     }
+    
+    //MARK: number max of characters
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        if let textField = textField as? UITextFiewCustom {
+            
+            let currentString: NSString = NSString(string: textField.text ?? "")
+            let newString: NSString =
+                NSString(string: currentString.replacingCharacters(in: range, with: string))
+            
+//            textField.text = textDidChange(textField.formattingMaskPattern, newString as String)
+            
+            if textField.maxCharacter == 0 {
+                return true
+            }
+            
+            return newString.length <= textField.maxCharacter
+        }
+        
+        
+        
+        return true
+    }
+
+    
+}
+
+
+class RangeCustom {
+    
+    static func stringIndex(_ string: String, _ offsetBy: Int) -> String.Index {
+        
+        return string.index(string.startIndex, offsetBy: offsetBy)
+        
+    }
+    
 }
