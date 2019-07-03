@@ -1,0 +1,101 @@
+//
+//  UITextField+custom.swift
+//  GenBit
+//
+//  Created by Proaire on 01/07/19.
+//  Copyright © 2019 Treepart. All rights reserved.
+//
+
+import UIKit
+
+class UITextFiewCustom: UITextField {
+    
+    fileprivate let padding = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+    var maxCharacter = 0
+    var formattingMaskPattern = ""
+    var replacementChar: Character = "*"
+    
+    override open func textRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds.inset(by: padding)
+    }
+    
+    override open func placeholderRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds.inset(by: padding)
+    }
+    
+    override open func editingRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds.inset(by: padding)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        setupTextField()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    fileprivate func setupTextField() {
+        
+        self.font = UIFont.systemFont(ofSize: 17)
+        self.borderStyle = UITextField.BorderStyle.line
+        self.returnKeyType = .next
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSNotification.Name(rawValue: "UITextFieldTextDidChangeNotification"), object: self)
+        
+        
+    }
+    
+//    func textDidChange(_ formattingPattern: String, _ text: String) -> String {
+    @objc func textDidChange() {
+        if let text = text, text.count > 0 && formattingMaskPattern.count > 0 {
+            let tempString = makeOnlyDigitsString(text)
+            
+            var finalText = ""
+            var stop = false
+            
+            var formatterIndex = formattingMaskPattern.startIndex
+            var tempIndex = tempString.startIndex
+            
+            var offsetFormat = 1
+            var offsetTemp = 1
+            
+            while !stop {
+                let formattingPatternRange = formatterIndex..<RangeCustom.stringIndex(formattingMaskPattern, offsetFormat)
+                
+                if formattingMaskPattern[formattingPatternRange] != String(replacementChar) {
+                    
+                    finalText = finalText.appendingFormat(formattingMaskPattern[formattingPatternRange])
+                    
+                }else if tempString.count > 0 {
+                    let pureStringRange = tempIndex..<RangeCustom.stringIndex(tempString, offsetTemp)
+                    finalText = finalText.appending(tempString[pureStringRange])
+                    tempIndex = RangeCustom.stringIndex(tempString, offsetTemp)
+                    offsetTemp += 1
+                }
+                
+                formatterIndex = RangeCustom.stringIndex(formattingMaskPattern, offsetFormat)
+                offsetFormat += 1
+                
+                //if formatterIndex >= formattingPattern.endIndex || tempIndex >= tempString.endIndex {
+                if offsetFormat > formattingMaskPattern.count || offsetTemp > tempString.count {
+                    stop = true
+                }
+            }
+            
+            self.text = finalText
+        }
+    }
+    
+    func makeOnlyDigitsString(_ string: String) -> String {
+        
+        let result = string.filter { (value) -> Bool in
+            return String(value).range(of: "([A-Za-z0-9])", options: String.CompareOptions.regularExpression, range: nil, locale: nil) != nil
+        }
+        
+        return result
+    }
+    
+}
