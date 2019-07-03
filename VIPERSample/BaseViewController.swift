@@ -2,8 +2,8 @@
 //  BaseViewController.swift
 //  GenBit
 //
-//  Created by Proaire on 01/07/19.
-//  Copyright © 2019 Treepart. All rights reserved.
+//  Created by Anderson Carvalho on 01/07/19.
+//  Copyright © 2019 asfcarvalho. All rights reserved.
 //
 
 import UIKit
@@ -126,8 +126,6 @@ extension BaseViewController: UITextFieldDelegate {
             let currentString: NSString = NSString(string: textField.text ?? "")
             let newString: NSString =
                 NSString(string: currentString.replacingCharacters(in: range, with: string))
-            
-//            textField.text = textDidChange(textField.formattingMaskPattern, newString as String)
             
             if textField.maxCharacter == 0 {
                 return true
