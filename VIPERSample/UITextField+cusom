@@ -2,8 +2,8 @@
 //  UITextField+custom.swift
 //  GenBit
 //
-//  Created by Proaire on 01/07/19.
-//  Copyright © 2019 Treepart. All rights reserved.
+//  Created by Anderson Carvalho on 01/07/19.
+//  Copyright © 2019 asfcarvalho. All rights reserved.
 //
 
 import UIKit
@@ -11,9 +11,39 @@ import UIKit
 class UITextFiewCustom: UITextField {
     
     fileprivate let padding = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+    
+    /// To set the max number of text characters
+    ///
+    /// Set **0** to disable
+    ///
+    /// By default, the function is disabled
     var maxCharacter = 0
+    
+    /// To set the mask pattern
+    ///
+    /// sample `(**) *****-****`
     var formattingMaskPattern = ""
     var replacementChar: Character = "*"
+    
+    /// To set string of message to show on error
+    /// by default `Error`
+    var errorMessage: String = "Error"
+    
+    fileprivate lazy var _errorMessage: UILabel = { [weak self] in
+        let label = UILabel()
+        label.text = self?.errorMessage //by default
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    /// To set the error message color
+    ///
+    /// by default *Red*
+    var errorColor: UIColor = UIColor.red
+    /// To set the error message font size
+    ///
+    /// by default *12.0*
+    var errorFontSize: CGFloat = 12.0
     
     override open func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: padding)
@@ -25,6 +55,12 @@ class UITextFiewCustom: UITextField {
     
     override open func editingRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: padding)
+    }
+    
+    init() {
+        super.init(frame: CGRect.zero)
+        
+        setupTextField()
     }
     
     override init(frame: CGRect) {
@@ -40,15 +76,19 @@ class UITextFiewCustom: UITextField {
     fileprivate func setupTextField() {
         
         self.font = UIFont.systemFont(ofSize: 17)
-        self.borderStyle = UITextField.BorderStyle.line
+        self.layer.borderWidth = 1.0
+        self.layer.borderColor = UIColor.black.cgColor
         self.returnKeyType = .next
         
         NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: NSNotification.Name(rawValue: "UITextFieldTextDidChangeNotification"), object: self)
-        
-        
     }
     
-//    func textDidChange(_ formattingPattern: String, _ text: String) -> String {
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: used to put the mask in textfield
     @objc func textDidChange() {
         if let text = text, text.count > 0 && formattingMaskPattern.count > 0 {
             let tempString = makeOnlyDigitsString(text)
@@ -79,7 +119,6 @@ class UITextFiewCustom: UITextField {
                 formatterIndex = RangeCustom.stringIndex(formattingMaskPattern, offsetFormat)
                 offsetFormat += 1
                 
-                //if formatterIndex >= formattingPattern.endIndex || tempIndex >= tempString.endIndex {
                 if offsetFormat > formattingMaskPattern.count || offsetTemp > tempString.count {
                     stop = true
                 }
@@ -89,6 +128,7 @@ class UITextFiewCustom: UITextField {
         }
     }
     
+    // return the string without special characters
     func makeOnlyDigitsString(_ string: String) -> String {
         
         let result = string.filter { (value) -> Bool in
@@ -96,6 +136,40 @@ class UITextFiewCustom: UITextField {
         }
         
         return result
+    }
+    
+    fileprivate func setupErrorMessage() {
+        _errorMessage.font = UIFont.systemFont(ofSize: errorFontSize)
+        _errorMessage.textColor = errorColor
+        self.layer.borderColor = errorColor.cgColor
+    }
+    
+    fileprivate func messageAnchor() {
+        let messageSize = _errorMessage.textRect(forBounds: self.frame, limitedToNumberOfLines: 0)
+        _errorMessage.anchor(top: self.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 2, left: 4, bottom: 0, right: 4), size: CGSize(width: 0, height: messageSize.height))
+    }
+    
+    /// use to set error in the textfield
+    /// - Parameters:
+    ///     - isError: **True** to show error message or **False** to hide
+    /// - Paramters configuration:
+    ///     - *errorFontSize* to set the error message font size
+    ///     - *errorColor* to set the error message color
+    func setError(_ isError: Bool) {
+        
+        if isError {
+            
+            setupErrorMessage()
+            
+            _errorMessage.removeFromSuperview()
+            
+            self.addSubview(_errorMessage)
+            messageAnchor()
+            
+        }else {
+            _errorMessage.removeFromSuperview()
+            self.layer.borderColor = UIColor.black.cgColor
+        }
     }
     
 }
