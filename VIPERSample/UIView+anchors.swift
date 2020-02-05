@@ -1,6 +1,5 @@
 //
 //  UIView+anchors.swift
-//  GenBit
 //
 //  Created by Anderson Carvalho on 01/07/19.
 //  Copyright © 2019 asfcarvalho. All rights reserved.
